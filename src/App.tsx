@@ -1,7 +1,8 @@
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import React, {useState} from 'react'
 import { StatusBar } from 'react-native'
 import Snackbar from 'react-native-snackbar'
+import Icons from './components/Icon'
 
 const App = (): JSX.Element => {
 
@@ -93,13 +94,45 @@ const App = (): JSX.Element => {
     setGameWinner("")
     setGameState(new Array(9).fill("empty", 0, 9))
   }
+
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{paddingHorizontal: 30}}>
       <StatusBar />
 
-      <View>
-        <Text>Tic Tac</Text>
-      </View>
+      {
+        gameWinner ? (
+          <View style={[styles.playerInfo, styles.winnerInfo]}>
+            <Text style={styles.winnerTxt}>{gameWinner}</Text>
+          </View>
+        ) : (
+          <View style={[styles.playerInfo, isCross ? styles.playerX : styles.playerO]}>
+            <Text style={styles.gameTurnTxt}>
+              Player {isCross ? "X" : "O"}'s Turn
+            </Text>
+          </View>
+        )
+      }
+
+      <FlatList 
+        numColumns={3}
+        data={gameState}
+        style={styles.grid}
+        renderItem={({item, index}) => (
+          <Pressable
+            key={index}
+            style={styles.card}
+            onPress={() => onChangeItem(index)}>
+              <Icons name={item}/>
+            </Pressable>
+        )}
+      />
+
+      <Pressable style={styles.gameBtn} onPress={reloadGame}>
+        <Text style={styles.gameBtnText}>
+          {gameWinner ? 'Start new game' : "reload the game"}
+        </Text>
+      </Pressable>
+
     </SafeAreaView>
   )
 }
@@ -137,7 +170,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7CD2E',
   },
   grid: {
-    margin: 12,
+    marginTop: 20
   },
   card: {
     height: 100,
@@ -163,10 +196,9 @@ const styles = StyleSheet.create({
   },
   gameBtn: {
     alignItems: 'center',
-
     padding: 10,
+    marginTop: 30,
     borderRadius: 8,
-    marginHorizontal: 36,
     backgroundColor: '#8D3DAF',
   },
   gameBtnText: {
